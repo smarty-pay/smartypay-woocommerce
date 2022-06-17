@@ -17,9 +17,9 @@ You will then need to go to your WordPress administration Plugins page, and acti
 
 You will need to set up an account on [SMARTy Pay](https://dashboard.smartypay.io).
 
-Choose "WooCommerce -> Settings" in admin's console and proceed to "Payments" tab. Choose "SMARTy Pay" in payment gateways list and proceed to settings.
-Fill in "Merchant API Key" and "Merchant API Secret" - these values can be found in your SMARTy Pay [Merchant Admin](https://dashboard.smartypay.io). 
-You can leave the rest settings as they go.
+1. Choose "WooCommerce -> Settings" in admin's console and proceed to "Payments" tab. Choose "SMARTy Pay" in payment gateways list and proceed to settings.
+2. Fill in "Merchant API Key" and "Merchant API Secret" - these values can be found in your SMARTy Pay [Merchant Admin](https://dashboard.smartypay.io). 
+3. You can leave the rest settings as they go.
 
 After saving your settings, you will have SMARTy Pay payments available on your website.
 
