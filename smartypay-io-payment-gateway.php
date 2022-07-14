@@ -6,7 +6,7 @@
  * Author URI: https://github.com/smarty-pay/smartypay-woocommerce
  * License: Apache License 2.0
  * License URI: https://raw.githubusercontent.com/smarty-pay/smartypay-woocommerce/main/LICENSE
- * Version: 1.0.0
+ * Version: 1.1.0
  * WC tested up to: 5.8.2
  * WC requires at least: 2.6
  *
@@ -67,18 +67,18 @@ function woocommerce_smartypayio_plugin_links($links)
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'woocommerce_smartypayio_plugin_links');
 
 
-function smartypayio_add_currencies($currencies)
+function smartypayio_add_currencies($sCurrencies)
 {
 
     $nCurrencies = require(plugin_basename('includes/currencies.php'));
 
     if (is_array($nCurrencies) || is_object($nCurrencies)) {
         foreach ($nCurrencies as $k => $nCur) {
-            $currencies[$k] = $nCur['des'];
+            $sCurrencies[$k] = __( $nCur['des'], 'smartypayio-payment-gateway' );
         }
     }
 
-    return $currencies;
+    return $sCurrencies;
 }
 
 add_filter('woocommerce_currencies', 'smartypayio_add_currencies');

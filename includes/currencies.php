@@ -1,7 +1,7 @@
 <?php
 
 $currencies = [
-    "bUSDT" => [
+	"bUSDT" =>  [
         'des' => 'Binance Smart chain (MainNet) - USDT',
         'symbol' => 'BUSD ',
     ],

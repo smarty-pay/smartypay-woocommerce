@@ -18,7 +18,7 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
     public $adm_notice;
     private $webhook_url;
     private $nCurrencies;
-    //private $ncheck = false;
+    private $debug;
 
     /**
      * Constructor
@@ -48,6 +48,7 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
         $this->description = $this->get_option('description');
         $this->enabled = $this->is_valid_for_use() ? 'yes' : 'no';
         $this->adm_notice = $this->is_valid_adm_notice() ? 'show' : 'no';
+        $this->debug =  $this->get_option('debug');
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 
@@ -56,11 +57,6 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
         }
 
         add_action('woocommerce_api_smartypayio_webhook', array($this, 'smartypayio_webhook'));
-
-        /*if($this->ncheck === false){
-            add_filter( 'woocommerce_currencies', array( $this, 'smartypayio_add_currencies' ) );
-            add_filter('woocommerce_currency_symbol',  array( $this, 'smartypayio_add_symbol'), 10, 2 );
-        }*/
 
         $this->webhook_url = get_bloginfo('url') . "/wc-api/smartypayio_webhook/";
     }
@@ -98,6 +94,11 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
                 'type' => 'password',
                 'description' => __('* Required. This is the merchant secret, received from SMARTy Pay', 'smartypayio-payment-gateway'),
                 'default' => '',
+            ),
+            'debug' => array(
+                'title' => __('Debug', 'smartypayio-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
             ),
         );
     }
@@ -142,6 +143,11 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
             'x-api-ts: ' . $nowInSec
         ];
 
+        if($this->debug){
+            $sendData = "{url => '".$url."', signature => '".$signature."', headers => '".json_encode($headers)."', body => '".$body."' }";
+            $this->loggingData('info', ' SMARTy Pay send Requests --->' . $sendData);
+        }
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -149,6 +155,10 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         $result = json_decode($result, 1);
+
+        if($this->debug){
+            $this->loggingData('info', 'Answer from SMARTy Pay <----' . json_encode($result));
+        }
 
         if ($result['invoice']['id']) {
             $name = $order_id;
@@ -184,6 +194,10 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
             $hash = $_SERVER['HTTP_X_SP_DIGEST'];
 
             if ($hash) {
+
+                if($this->debug){
+                    $this->loggingData('info', 'Answer from SMARTy Pay webHook <----' . $requestBody);
+                }
 
                 $signature = hash_hmac('sha256', $requestBody, $this->merchant_secret);
 
@@ -325,6 +339,40 @@ class WC_SmartyPayIo_Payment_Gateway extends WC_Payment_Gateway
                 . '</p></div>';
         }
         echo ob_get_clean();
+    }
+
+    public function loggingData($level, $text)
+    {
+        $logger = wc_get_logger();
+
+        $context = array( 'source' => 'SMARTy Pay' );
+
+        switch ($level) {
+            case 'debug':
+                $logger->debug( $text, $context );
+                break;
+            case 'info':
+                $logger->info( $text, $context );
+                break;
+            case 'notice':
+                $logger->notice( $text, $context );
+                break;
+            case 'warning':
+                $logger->warning( $text, $context );
+                break;
+            case 'error':
+                $logger->error( $text, $context );
+                break;
+            case 'critical':
+                $logger->critical( $text, $context );
+                break;
+            case 'alert':
+                $logger->alert( $text, $context );
+                break;
+            case 'emergency':
+                $logger->emergency( $text, $context );
+                break;
+        }
     }
 
 }

@@ -28,3 +28,6 @@ After saving your settings, you will have SMARTy Pay payments available on your 
 ## 1.0.0 ##
 * Initial release of the plugin
 
+## 1.1.0 ##
+* Added debug logging mode
+* Minor bugs fixed
